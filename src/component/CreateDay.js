@@ -21,10 +21,23 @@ export default function CreateDay() {
       }
     });
   }
+
+  function delDay() {
+    if (window.confirm("삭제 하시겠습니까?")) {
+      fetch(`http://localhost:3001/days/${days.length}`, {
+        method: "DELETE",
+      }).then(res => {
+        if (res.ok) {
+          navigate(`/`);
+        }
+      });
+    }
+  }
   return (
     <div>
       <h3>현재 일수 : {days.length}일</h3>
       <button onClick={addDay}>Day 추가</button>
+      <button onClick={delDay} className="btn_del">Day 삭제</button>
     </div>
   );
 }
