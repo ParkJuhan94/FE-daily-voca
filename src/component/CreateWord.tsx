@@ -1,33 +1,36 @@
-// React와 훅들을 불러옵니다.
+// React의 useRef와 useState 훅을 불러옵니다.
 import React, { useRef, useState } from "react";
-// react-router-dom에서 useNavigate 훅을 불러옵니다.
+// 페이지 이동을 위한 useNavigate 훅을 불러옵니다.
 import { useNavigate } from "react-router-dom";
-// 커스텀 훅과 인터페이스를 불러옵니다.
+// 커스텀 훅 useFetch와 Day 데이터 타입(IDay)을 불러옵니다.
 import useFetch from "../hooks/useFetch";
 import { IDay } from "./DayList";
 
+// CreateWord 컴포넌트는 새로운 단어를 생성하는 폼을 렌더링하고, 단어 생성을 처리합니다.
 export default function CreateWord() {
-  // useFetch 훅으로 날짜 목록을 가져옵니다.
+  // useFetch 훅을 사용하여 전체 Day 목록을 가져옵니다.
   const days: IDay[] = useFetch("http://localhost:3001/days");
-  // useNavigate 훅을 사용하여 페이지 이동 함수를 가져옵니다.
+  // useNavigate 훅을 사용하여 페이지 이동 함수를 초기화합니다.
   const navigate = useNavigate();
-  // 로딩 상태를 관리합니다.
+  // API 요청 중 로딩 상태를 관리하기 위한 state입니다.
   const [isLoading, setIsLoading] = useState(false);
 
-  // 폼 제출 시 호출되는 함수입니다.
+  // 폼 제출(onSubmit) 이벤트를 처리하는 함수입니다.
   function onSubmit(e: React.FormEvent) {
-    e.preventDefault(); // 기본 폼 제출 동작을 막습니다.
+    // form의 기본 동작(페이지 새로고침)을 막습니다.
+    e.preventDefault();
 
-    // 로딩 중이 아니고, 모든 입력 필드가 채워져 있을 때
+    // 로딩 중이 아닐 때만 단어 생성을 처리합니다.
     if (!isLoading && dayRef.current && engRef.current && korRef.current) {
-      setIsLoading(true); // 로딩 상태로 변경
+      // 로딩 상태를 true로 변경하여 중복 제출을 방지합니다.
+      setIsLoading(true);
 
-      // 입력된 값들을 가져옵니다.
+      // 각 ref에서 현재 입력된 값을 가져옵니다.
       const day = dayRef.current.value;
       const eng = engRef.current.value;
       const kor = korRef.current.value;
 
-      // API에 POST 요청을 보내 새로운 단어를 추가합니다.
+      // fetch API를 사용하여 서버에 새로운 단어를 추가합니다. (POST 요청)
       fetch(`http://localhost:3001/words/`, {
         method: "POST",
         headers: {
@@ -37,19 +40,22 @@ export default function CreateWord() {
           day,
           eng,
           kor,
-          isDone: false,
+          isDone: false, // 처음 생성된 단어는 '미완료' 상태입니다.
         }),
       }).then(res => {
+        // 요청이 성공적으로 완료되면
         if (res.ok) {
           alert("생성이 완료 되었습니다");
-          navigate(`/day/${day}`); // 해당 날짜 페이지로 이동
-          setIsLoading(false); // 로딩 상태 해제
+          // 해당 Day 페이지로 이동합니다.
+          navigate(`/day/${day}`);
+          // 로딩 상태를 다시 false로 변경합니다.
+          setIsLoading(false);
         }
       });
     }
   }
 
-  // useRef 훅을 사용하여 각 input 요소에 접근합니다.
+  // useRef를 사용하여 각 DOM 요소(input, select)에 직접 접근합니다.
   const engRef = useRef<HTMLInputElement>(null);
   const korRef = useRef<HTMLInputElement>(null);
   const dayRef = useRef<HTMLSelectElement>(null);
@@ -67,6 +73,7 @@ export default function CreateWord() {
       <div className="input_area">
         <label>Day</label>
         <select ref={dayRef}>
+          {/* 서버에서 가져온 Day 목록을 순회하며 option 태그를 생성합니다. */}
           {days.map(day => (
             <option key={day.id} value={day.day}>
               {day.day}
@@ -76,9 +83,11 @@ export default function CreateWord() {
       </div>
       <button
         style={{
+          // 로딩 중일 때는 버튼을 반투명하게 만들어 비활성화된 것처럼 보입니다.
           opacity: isLoading ? 0.3 : 1,
         }}
       >
+        {/* 로딩 상태에 따라 버튼 텍스트를 "Saving..." 또는 "저장"으로 표시합니다. */}
         {isLoading ? "Saving..." : "저장"}
       </button>
     </form>
