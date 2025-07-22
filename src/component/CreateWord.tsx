@@ -1,18 +1,12 @@
-// React의 useRef와 useState 훅을 불러옵니다.
 import React, { useRef, useState } from "react";
-// 페이지 이동을 위한 useNavigate 훅을 불러옵니다.
 import { useNavigate } from "react-router-dom";
-// 커스텀 훅 useFetch와 Day 데이터 타입(IDay)을 불러옵니다.
 import useFetch from "../hooks/useFetch";
 import { IDay } from "./DayList";
 
-// CreateWord 컴포넌트는 새로운 단어를 생성하는 폼을 렌더링하고, 단어 생성을 처리합니다.
 export default function CreateWord() {
-  // useFetch 훅을 사용하여 전체 Day 목록을 가져옵니다.
   const days: IDay[] = useFetch("http://localhost:3001/days");
   // useNavigate 훅을 사용하여 페이지 이동 함수를 초기화합니다.
   const navigate = useNavigate();
-  // API 요청 중 로딩 상태를 관리하기 위한 state입니다.
   const [isLoading, setIsLoading] = useState(false);
 
   // 폼 제출(onSubmit) 이벤트를 처리하는 함수입니다.

@@ -1,7 +1,5 @@
-// React에서 useEffect와 useState 훅을 불러옵니다.
 import { useEffect, useState } from "react";
 
-// useFetch라는 이름의 커스텀 훅을 정의합니다. 이 훅은 URL을 인자로 받습니다.
 export default function useFetch(url: string) {
   // useState 훅을 사용하여 데이터 상태를 관리합니다.
   const [data, setData] = useState([]);
