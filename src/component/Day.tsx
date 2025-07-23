@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import Word, { IWord } from "./Word";
 
@@ -7,30 +7,27 @@ export default function Day() {
   const { day } = useParams<{ day: string }>();
   const words: IWord[] = useFetch(`http://localhost:3001/words?day=${day}`);
   // const []
-  // const [isShow, setIsShow] = useState(false);
+  const history = useHistory();
 
-  // function del() {
-  //   if (window.confirm("삭제 하시겠습니까?")) {
-  //     fetch(`http://localhost:3001/words/${day}`, {
-  //       method: "DELETE",
-  //     }).then((res) => {
-  //       if (res.ok) {
-  //         // 단어의 id를 0으로 설정하여 화면에서 보이지 않도록 합니다.
-  //         setWord({
-  //           ...word,
-  //           id: 0,
-  //         });
-  //       }
-  //     });
-  //   }
-  // }
+  function del() {
+    if (window.confirm("삭제 하시겠습니까?")) {
+      fetch(`http://localhost:3001/days/${day}`, {
+        method: "DELETE",
+      }).then(res => {
+        if (res.ok) {
+          alert("삭제되었습니다.");
+          history.push(`/`);
+        }
+      });
+    }
+  }
 
   return (
     <>
       <h2>Day {day}</h2>
-      {/* <button onClick={del} className="btn_del">
+      <button onClick={del} className="btn_del">
         Day 삭제
-      </button> */}
+      </button>
       {/* 데이터 로딩 중일 때 "Loading..." 메시지를 표시합니다. */}
       {words.length === 0 && <span>Loading...</span>}
       <table>
