@@ -1,4 +1,4 @@
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import Word, { IWord } from "./Word";
 
@@ -7,27 +7,42 @@ export default function Day() {
   const { day } = useParams<{ day: string }>();
   const words: IWord[] = useFetch(`http://localhost:3001/words?day=${day}`);
   // const []
-  const history = useHistory();
+  const navigate = useNavigate();
 
   function del() {
     if (window.confirm("삭제 하시겠습니까?")) {
-      fetch(`http://localhost:3001/days/${day}`, {
-        method: "DELETE",
-      }).then(res => {
-        if (res.ok) {
-          alert("삭제되었습니다.");
-          history.push(`/`);
-        }
-      });
+      const wordDeletePromises = words.map(word =>
+        fetch(`http://localhost:3001/words/${word.id}`, {
+          method: "DELETE",
+        })
+      );
+
+      Promise.all(wordDeletePromises)
+        .then(() => {
+          fetch(`http://localhost:3001/days/${day}`, {
+            method: "DELETE",
+          }).then((res) => {
+            if (res.ok) {
+              alert("삭제되었습니다.");
+              navigate("/");
+            }
+          });
+        })
+        .catch(err => {
+          console.error("Word deletion failed", err);
+          alert("단어 삭제 중 오류가 발생했습니다.");
+        });
     }
   }
 
   return (
     <>
       <h2>Day {day}</h2>
-      <button onClick={del} className="btn_del">
-        Day 삭제
-      </button>
+      <div style={{ marginBottom: "50px" }}>
+        <button onClick={del} className="btn_del">
+          Day 삭제
+        </button>
+      </div>
       {/* 데이터 로딩 중일 때 "Loading..." 메시지를 표시합니다. */}
       {words.length === 0 && <span>Loading...</span>}
       <table>
